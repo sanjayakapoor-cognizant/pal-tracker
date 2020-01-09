@@ -26,10 +26,13 @@ public class InMemoryTimeEntryRepository implements TimeEntryRepository{
     }
 
     public TimeEntry update(long TimeEntryId, TimeEntry TimeEntr){
-        if (this.find(TimeEntryId) != null){
-            TimeEntry FoundTimeEntry = this.find(TimeEntryId);
-            FoundTimeEntry = TimeEntr;
-            return this.find(TimeEntryId);
+        TimeEntry FoundTimeEntry = this.find(TimeEntryId);
+        if (FoundTimeEntry != null){
+            FoundTimeEntry.setUserId(TimeEntr.getUserId());
+            FoundTimeEntry.setDate(TimeEntr.getDate());
+            FoundTimeEntry.setProjectId(TimeEntr.getProjectId());
+            FoundTimeEntry.setHours(TimeEntr.getHours());
+            return FoundTimeEntry;
         }
         return null;
     }

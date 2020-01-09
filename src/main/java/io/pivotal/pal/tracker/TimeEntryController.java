@@ -63,9 +63,9 @@ public class TimeEntryController {
     public ResponseEntity delete(@PathVariable long timeEntryId) {
         boolean value   = this.timeEntryRepository.delete(timeEntryId);
         var headers = new HttpHeaders();
-        if (value == true){
-            return ResponseEntity.status(HttpStatus.FOUND).headers(headers).body(null);
-        }
+//        if (value == true){
+//            return ResponseEntity.status(HttpStatus.FOUND).headers(headers).body(null);
+//        }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(headers).body(null);
     }
 

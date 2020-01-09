@@ -1,8 +1,8 @@
 package io.pivotal.pal.tracker;
-import org.apache.tomcat.jni.Time;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.sql.Time;
 import java.time.LocalDate;
 import java.util.Collection;
 
@@ -69,8 +69,8 @@ public class TimeEntry {
         this.hours = hours;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setProjectId(long id) {
+        this.projectId = id;
     }
 
     public void setUserId(long userId) {
