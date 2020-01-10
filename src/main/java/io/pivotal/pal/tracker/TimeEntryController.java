@@ -1,72 +1,76 @@
 package io.pivotal.pal.tracker;
 
-import org.springframework.http.HttpHeaders;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.DistributionSummary;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller("/time-entries")
+@RestController
+@RequestMapping("/time-entries")
 public class TimeEntryController {
 
-    private TimeEntryRepository timeEntryRepository;
-    public TimeEntryController (TimeEntryRepository timeEntryRepository){
-        this.timeEntryRepository = timeEntryRepository;
+    private TimeEntryRepository timeEntriesRepo;
+    private final DistributionSummary timeEntrySummary;
+    private final Counter actionCounter;
+
+    public TimeEntryController(
+            TimeEntryRepository timeEntriesRepo,
+            MeterRegistry meterRegistry
+    ) {
+        this.timeEntriesRepo = timeEntriesRepo;
+
+        timeEntrySummary = meterRegistry.summary("timeEntry.summary");
+        actionCounter = meterRegistry.counter("timeEntry.actionCounter");
     }
 
-    @GetMapping(value="/time-entries/{EntryId}")
-    public ResponseEntity<TimeEntry> read(@PathVariable long EntryId){
-        var timeEntry = timeEntryRepository.find(EntryId);
-        HttpStatus HStatus = HttpStatus.NOT_FOUND;
-        var headers = new HttpHeaders();
-        headers.add("Responded", "TimeEntryController");
-        if ( timeEntry != null){
-            HStatus = HttpStatus.OK;
-        }
-        return ResponseEntity.status(HStatus).headers(headers).body(timeEntry);
+    @PostMapping
+    public ResponseEntity<TimeEntry> create(@RequestBody TimeEntry timeEntry) {
+        TimeEntry createdTimeEntry = timeEntriesRepo.create(timeEntry);
+        actionCounter.increment();
+        timeEntrySummary.record(timeEntriesRepo.list().size());
 
+        return new ResponseEntity<>(createdTimeEntry, HttpStatus.CREATED);
     }
 
-    @PutMapping(value="/time-entries/{EntryId}", consumes = "application/json")
-    public ResponseEntity<TimeEntry> update(@PathVariable long EntryId, @RequestBody TimeEntry TimeEnt){
-        HttpStatus HStatus = HttpStatus.NOT_FOUND;
-        var timeEntry = timeEntryRepository.update(EntryId,TimeEnt);
-        var headers = new HttpHeaders();
-        headers.add("Responded", "TimeEntryController");
+    @GetMapping("{id}")
+    public ResponseEntity<TimeEntry> read(@PathVariable Long id) {
+        TimeEntry timeEntry = timeEntriesRepo.find(id);
         if (timeEntry != null) {
-            HStatus = HttpStatus.OK;
+            actionCounter.increment();
+            return new ResponseEntity<>(timeEntry, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.status(HStatus).headers(headers).body(timeEntry);
     }
 
-    @GetMapping("/time-entries")
-     public ResponseEntity<List<TimeEntry>> list(){
-        var timeEntryList = timeEntryRepository.list();
-        HttpStatus HStatus = HttpStatus.OK;
-        var headers = new HttpHeaders();
-        headers.add("Responded", "TimeEntryController");
-        return ResponseEntity.status(HStatus).headers(headers).body(timeEntryList);
+    @GetMapping
+    public ResponseEntity<List<TimeEntry>> list() {
+        actionCounter.increment();
+        return new ResponseEntity<>(timeEntriesRepo.list(), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/time-entries", consumes = "application/json")
-     public ResponseEntity create(@RequestBody TimeEntry timeEntryToCreate) {
-        var timeEntry = timeEntryRepository.create(timeEntryToCreate);
-        var headers = new HttpHeaders();
-        headers.add("Responded", "TimeEntryController");
-        return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(timeEntry);
-
+    @PutMapping("{id}")
+    public ResponseEntity<TimeEntry> update(@PathVariable Long id, @RequestBody TimeEntry timeEntry) {
+        TimeEntry updatedTimeEntry = timeEntriesRepo.update(id, timeEntry);
+        if (updatedTimeEntry != null) {
+            actionCounter.increment();
+            return new ResponseEntity<>(updatedTimeEntry, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    @DeleteMapping(value="/time-entries/{timeEntryId}")
-    public ResponseEntity delete(@PathVariable long timeEntryId) {
-        this.timeEntryRepository.delete(timeEntryId);
-        var headers = new HttpHeaders();
-//        if (value == true){
-//            return ResponseEntity.status(HttpStatus.FOUND).headers(headers).body(null);
-//        }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(headers).body(null);
-    }
+    @DeleteMapping("{id}")
+    public ResponseEntity delete(@PathVariable Long id) {
+        timeEntriesRepo.delete(id);
+        actionCounter.increment();
+        timeEntrySummary.record(timeEntriesRepo.list().size());
 
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
 }
+
