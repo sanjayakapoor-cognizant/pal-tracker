@@ -8,13 +8,8 @@ public interface TimeEntryRepository {
     //private static List<TimeEntry> list; = new ArrayList<TimeEntry>();
 
     TimeEntry create(TimeEntry TimeEntr);
-    TimeEntry find(long timeEntryId);
-    TimeEntry update(long TimeEntryId, TimeEntry TimeEntr);
-    public List<TimeEntry> list();
-    boolean delete(long id);
-
-
+    TimeEntry find(Long timeEntryId);
     TimeEntry update(Long id, TimeEntry timeEntry);
-
+    List<TimeEntry> list();
     void delete(Long id);
 }

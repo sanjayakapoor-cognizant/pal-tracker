@@ -44,15 +44,6 @@ public class JdbcTimeEntryRepository implements TimeEntryRepository {
     }
 
     @Override
-    public TimeEntry find(long timeEntryId) {
-        return null;
-    }
-
-    @Override
-    public TimeEntry update(long TimeEntryId, TimeEntry TimeEntr) {
-        return null;
-    }
-
     public TimeEntry find(Long id) {
         return jdbcTemplate.query(
                 "SELECT id, project_id, user_id, date, hours FROM time_entries WHERE id = ?",
@@ -63,11 +54,6 @@ public class JdbcTimeEntryRepository implements TimeEntryRepository {
     @Override
     public List<TimeEntry> list() {
         return jdbcTemplate.query("SELECT id, project_id, user_id, date, hours FROM time_entries", mapper);
-    }
-
-    @Override
-    public boolean delete(long id) {
-        return false;
     }
 
     @Override

@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InMemoryTimeEntryRepository implements TimeEntryRepository{
+public class InMemoryTimeEntryRepository {
     private static List<TimeEntry> list = new ArrayList<TimeEntry>();
 
     public TimeEntry create(TimeEntry TimeEntr){
@@ -49,15 +49,7 @@ public class InMemoryTimeEntryRepository implements TimeEntryRepository{
         return false;
     }
 
-    @Override
-    public TimeEntry update(Long id, TimeEntry timeEntry) {
-        return null;
-    }
 
-    @Override
-    public void delete(Long id) {
-
-    }
 
     public  List<TimeEntry> list() {
         return list;

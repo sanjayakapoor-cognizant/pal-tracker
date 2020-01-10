@@ -61,7 +61,7 @@ public class TimeEntryController {
 
     @DeleteMapping(value="/time-entries/{timeEntryId}")
     public ResponseEntity delete(@PathVariable long timeEntryId) {
-        boolean value   = this.timeEntryRepository.delete(timeEntryId);
+        this.timeEntryRepository.delete(timeEntryId);
         var headers = new HttpHeaders();
 //        if (value == true){
 //            return ResponseEntity.status(HttpStatus.FOUND).headers(headers).body(null);
