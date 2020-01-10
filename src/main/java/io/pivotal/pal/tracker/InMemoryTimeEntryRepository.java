@@ -49,6 +49,16 @@ public class InMemoryTimeEntryRepository implements TimeEntryRepository{
         return false;
     }
 
+    @Override
+    public TimeEntry update(Long id, TimeEntry timeEntry) {
+        return null;
+    }
+
+    @Override
+    public void delete(Long id) {
+
+    }
+
     public  List<TimeEntry> list() {
         return list;
     }
